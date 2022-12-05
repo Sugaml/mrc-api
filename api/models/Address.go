@@ -3,27 +3,30 @@ package models
 import "github.com/jinzhu/gorm"
 
 type ParmanentAddress struct {
-	Country     string
-	State       string
-	Street      string
-	WardNumber  uint
-	HouseNumber string
-	PostalCode  string
+	Country      string `json:"country"`
+	Provience    string `json:"provience"`
+	City         string `json:"city"`
+	Municipality string `json:"municipality"`
+	Street       string `json:"street"`
+	WardNumber   uint   `json:"ward_number"`
+	HouseNumber  string `json:"house_number"`
+	PostalCode   string `json:"postal_code"`
 }
 
 type TemporaryAddress struct {
-	TCountry     string
-	TState       string
-	TStreet      string
-	TWardNumber  uint
-	THouseNumber string
-	TPostalCode  string
+	TCountry      string `json:"tcountry"`
+	TProvience    string `json:"tprovience"`
+	TCity         string `json:"tcity"`
+	TMunicipality string `json:"tmunicipality"`
+	TStreet       string `json:"tstreet"`
+	TWardNumber   uint   `json:"tward_number"`
+	THouseNumber  string `json:"thouse_number"`
+	TPostalCode   string `json:"tpostal_code"`
 }
 
 type Address struct {
 	gorm.Model
+	StudentID uint `json:"student_id"`
 	ParmanentAddress
 	TemporaryAddress
-	SID     uint
-	Student Student
 }

@@ -2,7 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"os"
 	"sugam-project/api/repository"
+	"sugam-project/api/utils/storage"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -10,9 +12,10 @@ import (
 )
 
 type Server struct {
-	DB     *gorm.DB    //gorm db
-	Router *mux.Router //router
-	MRepo  interface{} //mockrepo for testing
+	DB            *gorm.DB    //gorm db
+	Router        *mux.Router //router
+	MRepo         interface{} //mockrepo for testing
+	StorageClient storage.IStorage
 }
 
 func NewServer(db *gorm.DB) (*Server, error) {
@@ -22,6 +25,11 @@ func NewServer(db *gorm.DB) (*Server, error) {
 	}
 	repository.Migrate(&repository.Repository{DB: server.DB})
 	server.initializeRoutes()
+	stoarageClient, err := storage.NewStorage(os.Getenv("STORAGE_TYPE"))
+	if err != nil {
+		return nil, err
+	}
+	server.StorageClient = stoarageClient
 	return server, nil
 }
 

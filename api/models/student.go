@@ -14,5 +14,5 @@ type Student struct {
 	ParanetMobile  string `gorm:"parent_mobile" json:"parent_mobile"`
 	ParentRelation string `gorm:"parent_relation" json:"parent_relation"`
 	CID            uint   `gorm:"cid" json:"cid"`
-	Course         Course ` json:"course"`
+	Course         Course `gorm:"foreignkey:CID" json:"course"`
 }
