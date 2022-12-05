@@ -11,5 +11,5 @@ type StudentFile struct {
 	CertificateMigration  string `json:"certificate_migration"`
 	CitizenshipFront      string `json:"citizenship_front"`
 	CitizenshipBack       string `json:"citizenship_back"`
-	StudentID             string `json:"student_id"`
+	StudentID             uint   `json:"student_id"`
 }
