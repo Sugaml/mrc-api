@@ -10,9 +10,9 @@ func (server *Server) setJSON(path string, next func(http.ResponseWriter, *http.
 	server.Router.HandleFunc(path, middleware.SetMiddlewareJSON(next)).Methods(method, "OPTIONS")
 }
 
-// func (server *Server) setAdmin(path string, next func(http.ResponseWriter, *http.Request), method string) {
-// 	server.setJSON(path, middleware.SetAdminMiddlewareAuthentication(next), method)
-// }
+func (server *Server) setAdmin(path string, next func(http.ResponseWriter, *http.Request), method string) {
+	server.setJSON(path, middleware.SetAdminMiddlewareAuthentication(next), method)
+}
 
 func (server *Server) initializeRoutes() {
 	server.Router.Use(middleware.CORS)
@@ -21,8 +21,8 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/course", server.CreateCourse, "POST")
 	server.setJSON("/course/{id}", server.GetCourseByID, "GET")
 	server.setJSON("/courses", server.GetCourses, "GET")
-	server.setJSON("/course/{id}", server.UpdateCourse, "PUT")
-	server.setJSON("/course/{id}", server.DeleteCourse, "DELETE")
+	server.setAdmin("/course/{id}", server.UpdateCourse, "PUT")
+	server.setAdmin("/course/{id}", server.DeleteCourse, "DELETE")
 
 	server.setJSON("/user", server.CreateUser, "POST")
 	server.setJSON("/user/login", server.GetLogin, "POST")
@@ -30,10 +30,19 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/users", server.GetUsers, "GET")
 	server.setJSON("/user/{id}", server.UpdateUser, "PUT")
 	server.setJSON("/user/{id}", server.DeleteUser, "DELETE")
-
 	server.setJSON("/user/forgot-password", server.ForgotPassword, "POST")
 
 	server.setJSON("/student_info", server.StudentInfo, "POST")
+	server.setJSON("/student_info/{id}", server.StudentDetail, "GET")
+	server.setJSON("/student/address", server.StudentAddress, "POST")
+	server.setJSON("/student/education", server.StudentEducation, "POST")
+	server.setJSON("/student/file", server.StudentFileInfo, "POST")
+	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
+	server.setJSON("/student/{sid}/sfile", server.GetStudentFile, "GET")
+	server.setJSON("/student/{sid}", server.UpdateStudentInfo, "PUT")
+	server.setJSON("/student/{sid}/address", server.UpdateStudentAddress, "PUT")
+	server.setJSON("/student/{sid}/education", server.UpdateStudentEducation, "PUT")
+	server.setJSON("/student/{sid}/file", server.UpdateStudentFile, "PUT")
 }
 
 func (server *Server) WelcomePage(w http.ResponseWriter, r *http.Request) {

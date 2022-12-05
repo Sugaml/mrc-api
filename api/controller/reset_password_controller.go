@@ -20,6 +20,7 @@ func (server *Server) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	defer r.Body.Close()
 	resetPasswordRequest := models.ResetPasswordRequest{}
 	err = json.Unmarshal(body, &resetPasswordRequest)
 	if err != nil {

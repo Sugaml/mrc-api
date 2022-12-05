@@ -27,6 +27,7 @@ func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	defer r.Body.Close()
 	data := &models.Course{}
 	err = json.Unmarshal(body, data)
 	if err != nil {
@@ -131,7 +132,6 @@ func (server *Server) CheckAuthorization(r *http.Request) error {
 }
 
 func (server *Server) CheckAdminAuthorization(r *http.Request) error {
-	fmt.Print("init...")
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
 		return err

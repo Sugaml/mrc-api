@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -12,15 +13,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var srepo = repository.NewStudentRepo()
+var sfrepo = repository.NewStudentFileRepo()
 
-func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
+func (server *Server) StudentFileInfo(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	data := &models.Student{}
+	defer r.Body.Close()
+	data := &models.StudentFile{}
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -32,22 +34,28 @@ func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
 	// 	responses.ERROR(w, http.StatusBadRequest, err)
 	// 	return
 	// }
-	course, err := srepo.SaveStudent(server.DB, data)
+	path, err := server.StorageClient.UplodaImage(context.Background(), data.CertifiacteTranscript, "certificate")
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	data.CertifiacteTranscript = path.SecureURL
+	sfile, err := sfrepo.SaveStudentFile(server.DB, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, sfile)
 }
 
-func (server *Server) UpdateStudentInfo(w http.ResponseWriter, r *http.Request) {
+func (server *Server) UpdateStudentFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	cid, err := strconv.ParseUint(vars["sid"], 10, 64)
+	sid, err := strconv.ParseUint(vars["sid"], 10, 64)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	studentInfo, err := srepo.FindbyId(server.DB, uint(cid))
+	studentFile, err := sfrepo.FindStudenFilebyId(server.DB, uint(sid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
@@ -57,50 +65,45 @@ func (server *Server) UpdateStudentInfo(w http.ResponseWriter, r *http.Request) 
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	err = json.Unmarshal(body, studentInfo)
+	err = json.Unmarshal(body, studentFile)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	studentUpdated, err := srepo.UpdateStudent(server.DB, studentInfo, uint(cid))
+	studentFileUpdated, err := sfrepo.UpdateStudentFile(server.DB, studentFile, uint(sid))
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, studentUpdated)
+	responses.JSON(w, http.StatusOK, studentFileUpdated)
 }
 
-func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
+func (server *Server) DeleteStudentFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	student, err := srepo.FindbyId(server.DB, uint(cid))
+	sfile, err := sfrepo.DeleteStudentFile(server.DB, uint(cid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, student)
+	responses.JSON(w, http.StatusOK, sfile)
 }
 
-func (server *Server) DeleteStudent(w http.ResponseWriter, r *http.Request) {
+func (server *Server) GetStudentFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["sid"], 10, 64)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	student, err := srepo.FindbyId(server.DB, uint(cid))
+	studentFile, err := sfrepo.FindStudenFilebyId(server.DB, uint(cid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	_, err = srepo.DeleteStudent(server.DB, student.ID)
-	if err != nil {
-		responses.ERROR(w, http.StatusNotFound, err)
-		return
-	}
-	responses.JSON(w, http.StatusOK, "Deleted Successfully")
+	responses.JSON(w, http.StatusOK, studentFile)
 }

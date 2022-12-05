@@ -41,7 +41,7 @@ func (cr *StudentRepo) FindAllStudent(db *gorm.DB) (*[]models.Student, error) {
 
 func (cr *StudentRepo) FindbyId(db *gorm.DB, cid uint) (*models.Student, error) {
 	data := &models.Student{}
-	err := db.Model(models.Student{}).Where("id = ?", cid).Take(&data).Error
+	err := db.Model(models.Student{}).Preload("Course").Where("id = ?", cid).Take(&data).Error
 	if err != nil {
 		return &models.Student{}, err
 	}
