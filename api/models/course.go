@@ -16,6 +16,9 @@ type Course struct {
 	CourseType   string `gorm:"course_type" json:"course_type"`
 	AffiliatedBy string `gorm:"affiliated_by" json:"affiliated_by"`
 	Quota        int    `gorm:"quota" json:"quota"`
+	Subject      uint   `gorm:"subject" json:"subject"`
+	Faculty      string `gorm:"faculty" json:"faculty"`
+	Year         uint   `gorm:"year" json:"year"`
 	IsActive     bool   `gorm:"is_active" json:"is_active"`
 }
 
