@@ -26,7 +26,7 @@ func (server *Server) initializeRoutes() {
 
 	server.setJSON("/user", server.CreateUser, "POST")
 	server.setJSON("/user/login", server.GetLogin, "POST")
-	server.setJSON("/user/{id}", server.GetUserByID, "GET")
+	server.setJSON("/user", server.GetUserByID, "GET")
 	server.setJSON("/users", server.GetUsers, "GET")
 	server.setJSON("/user/{id}", server.UpdateUser, "PUT")
 	server.setJSON("/user/{id}", server.DeleteUser, "DELETE")
@@ -34,6 +34,7 @@ func (server *Server) initializeRoutes() {
 
 	server.setJSON("/student_info", server.StudentInfo, "POST")
 	server.setJSON("/student_info/{id}", server.StudentDetail, "GET")
+	server.setJSON("/student/general-info", server.StudentGeneralInfo, "GET")
 	server.setJSON("/student/address", server.StudentAddress, "POST")
 	server.setJSON("/student/education", server.StudentEducation, "POST")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")

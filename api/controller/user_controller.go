@@ -43,18 +43,17 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	uid, err := strconv.ParseUint(vars["id"], 10, 64)
+	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	course, err := urepo.FindbyId(server.DB, uint(uid))
+	user, err := urepo.FindbyId(server.DB, uint(uid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	responses.JSON(w, http.StatusOK, user)
 }
 
 func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {

@@ -10,6 +10,7 @@ import (
 type IStudent interface {
 	FindAllStudent(db *gorm.DB) (*[]models.Student, error)
 	FindbyId(db *gorm.DB, cid uint) (*models.Student, error)
+	FindbyUserId(db *gorm.DB, uid uint) (*models.Student, error)
 	SaveStudent(db *gorm.DB, Student *models.Student) (*models.Student, error)
 	UpdateStudent(db *gorm.DB, Student *models.Student, cid uint) (*models.Student, error)
 	DeleteStudent(db *gorm.DB, cid uint) (int64, error)
@@ -42,6 +43,15 @@ func (cr *StudentRepo) FindAllStudent(db *gorm.DB) (*[]models.Student, error) {
 func (cr *StudentRepo) FindbyId(db *gorm.DB, cid uint) (*models.Student, error) {
 	data := &models.Student{}
 	err := db.Model(models.Student{}).Preload("Course").Where("id = ?", cid).Take(&data).Error
+	if err != nil {
+		return &models.Student{}, err
+	}
+	return data, nil
+}
+
+func (cr *StudentRepo) FindbyUserId(db *gorm.DB, uid uint) (*models.Student, error) {
+	data := &models.Student{}
+	err := db.Model(models.Student{}).Preload("User").Where("user_id = ?", uid).Take(&data).Error
 	if err != nil {
 		return &models.Student{}, err
 	}

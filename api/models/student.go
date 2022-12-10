@@ -15,4 +15,6 @@ type Student struct {
 	ParentRelation string `gorm:"parent_relation" json:"parent_relation"`
 	CID            uint   `gorm:"cid" json:"cid"`
 	Course         Course `gorm:"foreignkey:CID" json:"course"`
+	UserId         uint   `gorm:"user_id" json:"user_id"`
+	User           User   `gorm:"foreignkey:UserId" json:"user"`
 }

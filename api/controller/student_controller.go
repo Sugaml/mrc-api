@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"sugam-project/api/auth"
 	"sugam-project/api/models"
 	"sugam-project/api/repository"
 	"sugam-project/api/responses"
@@ -15,6 +16,11 @@ import (
 var srepo = repository.NewStudentRepo()
 
 func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -32,6 +38,7 @@ func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
 	// 	responses.ERROR(w, http.StatusBadRequest, err)
 	// 	return
 	// }
+	data.UserId = uid
 	course, err := srepo.SaveStudent(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
@@ -68,6 +75,20 @@ func (server *Server) UpdateStudentInfo(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	responses.JSON(w, http.StatusOK, studentUpdated)
+}
+
+func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	student, err := srepo.FindbyUserId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, student)
 }
 
 func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
