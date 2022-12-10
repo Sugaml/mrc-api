@@ -30,7 +30,7 @@ func NewStudentAddress(data models.Student) *models.Student {
 
 func (cr *StudentAddressRepo) FindStudentAddressbyId(db *gorm.DB, sid uint) (*models.Address, error) {
 	data := &models.Address{}
-	err := db.Model(models.Address{}).Preload("Student").Where("student_id = ?", sid).Take(&data).Error
+	err := db.Model(models.Address{}).Where("student_id = ?", sid).Take(&data).Error
 	if err != nil {
 		return nil, err
 	}
