@@ -34,7 +34,7 @@ func (server *Server) StudentFileInfo(w http.ResponseWriter, r *http.Request) {
 	// 	responses.ERROR(w, http.StatusBadRequest, err)
 	// 	return
 	// }
-	path, err := server.StorageClient.UplodaImage(context.Background(), data.CertifiacteTranscript, "certificate")
+	path, err := server.StorageClient.UplodaImage(context.Background(), data.SEECharacter, "certificate")
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return

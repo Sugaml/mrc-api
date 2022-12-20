@@ -39,11 +39,12 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/student/education", server.StudentEducation, "POST")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")
 	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
-	server.setJSON("/student/{sid}/sfile", server.GetStudentFile, "GET")
+	server.setJSON("/student/{sid}/document", server.GetStudentFile, "GET")
+
 	server.setJSON("/student/{sid}", server.UpdateStudentInfo, "PUT")
 	server.setJSON("/student/{sid}/address", server.UpdateStudentAddress, "PUT")
 	server.setJSON("/student/{sid}/education", server.UpdateStudentEducation, "PUT")
-	server.setJSON("/student/{sid}/file", server.UpdateStudentFile, "PUT")
+	server.setJSON("/student/{sid}/document", server.UpdateStudentFile, "PUT")
 }
 
 func (server *Server) WelcomePage(w http.ResponseWriter, r *http.Request) {
