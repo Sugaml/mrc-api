@@ -1,7 +1,12 @@
 package controller
 
 import (
+	"bytes"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"sugam-project/api/auth"
 	"sugam-project/api/middleware"
 	"sugam-project/api/responses"
 )
@@ -17,6 +22,7 @@ func (server *Server) setAdmin(path string, next func(http.ResponseWriter, *http
 func (server *Server) initializeRoutes() {
 	server.Router.Use(middleware.CORS)
 	server.setJSON("/", server.WelcomePage, "GET")
+	server.SetRoutes("/payment", "PAYMENT_SERVER_URL")
 
 	server.setJSON("/course", server.CreateCourse, "POST")
 	server.setJSON("/course/{id}", server.GetCourseByID, "GET")
@@ -49,4 +55,52 @@ func (server *Server) initializeRoutes() {
 
 func (server *Server) WelcomePage(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, "welcome to mrc-api service")
+}
+
+func (server *Server) SetRoutes(path string, envValue string) {
+	server.Router.PathPrefix(path).HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		r.Body = ioutil.NopCloser(bytes.NewReader(body))
+		url := fmt.Sprintf("%s%s", os.Getenv(envValue), r.RequestURI)
+		proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusBadGateway)
+			return
+		}
+		copyHeader(proxyReq.Header, r.Header)
+		userId, _ := auth.ExtractTokenID(r)
+		if userId != 0 {
+			userGotten, _ := urepo.FindbyId(server.DB, userId)
+			proxyReq.Header.Set("x-user-id", fmt.Sprint(userId))
+			if userGotten != nil && userGotten.IsAdmin {
+				proxyReq.Header.Set("x-user-role", "ADMIN")
+			}
+		}
+		httpClient := http.Client{}
+		resp, err := httpClient.Do(proxyReq)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusBadGateway)
+			return
+		}
+		defer resp.Body.Close()
+		response, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		copyHeader(rw.Header(), resp.Header)
+		rw.WriteHeader(resp.StatusCode)
+		_, _ = rw.Write(response)
+	})
+}
+func copyHeader(dst, src http.Header) {
+	for k, vv := range src {
+		for _, v := range vv {
+			dst.Add(k, v)
+		}
+	}
 }
