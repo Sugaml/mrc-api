@@ -18,6 +18,7 @@ type IUser interface {
 	FindbyUsername(db *gorm.DB, username string) (*models.User, error)
 	Save(db *gorm.DB, user *models.User) (*models.User, error)
 	Update(db *gorm.DB, user *models.User, uid uint) (*models.User, error)
+	UpdatePassword(db *gorm.DB, u *models.User) error
 	Delete(db *gorm.DB, uid uint) (int64, error)
 }
 
@@ -35,27 +36,25 @@ func isHashed(password string) bool {
 	return len(password) == 60
 }
 
+func BeforeSave(u *models.User) error {
+	if !isHashed(u.Password) {
+		hashedPassword, err := Hash(u.Password)
+		if err != nil {
+			return err
+		}
+		u.Password = string(hashedPassword)
+	}
+	return nil
+}
+
 func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
-
-// func (u *User) BeforeSave() error {
-// 	if !isHashed(u.Password) {
-// 		hashedPassword, err := Hash(u.Password)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		u.Password = string(hashedPassword)
-// 	}
-// 	return nil
-// }
 
 func Prepares(u *models.User) {
 	u.ID = 0
 	u.FirstName = html.EscapeString(strings.TrimSpace(u.FirstName))
 	u.LastName = html.EscapeString(strings.TrimSpace(u.LastName))
-	// u.Company = html.EscapeString(strings.TrimSpace(u.Company))
-	// u.Designation = html.EscapeString(strings.TrimSpace(u.Designation))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
@@ -184,6 +183,24 @@ func (cr *UserRepo) Update(db *gorm.DB, user *models.User, uid uint) (*models.Us
 		return nil, err
 	}
 	return data, nil
+}
+
+func (ur *UserRepo) UpdatePassword(db *gorm.DB, u *models.User) error {
+	err := BeforeSave(u)
+	if err != nil {
+		log.Error()
+		return err
+	}
+	db = db.Model(&models.User{}).Where("email = ?", u.Email).Take(&models.User{}).UpdateColumns(
+		map[string]interface{}{
+			"password":       u.Password,
+			"email_verified": true,
+		},
+	)
+	if db.Error != nil {
+		return db.Error
+	}
+	return nil
 }
 
 func (cr *UserRepo) Delete(db *gorm.DB, uid uint) (int64, error) {

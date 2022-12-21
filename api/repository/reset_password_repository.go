@@ -10,6 +10,7 @@ import (
 
 type ResetPasswordInterface interface {
 	SaveDatails(db *gorm.DB, data *models.ResetPassword) (*models.ResetPassword, error)
+	FindByToken(db *gorm.DB, token string) (*models.ResetPassword, error)
 	DeleteDetails(db *gorm.DB, data *models.ResetPassword) (int64, error)
 }
 type ResetPasswordType struct {
@@ -30,6 +31,15 @@ func (d *ResetPasswordType) SaveDatails(db *gorm.DB, resetPassword *models.Reset
 		return &models.ResetPassword{}, err
 	}
 	return resetPassword, nil
+}
+
+func (d *ResetPasswordType) FindByToken(db *gorm.DB, token string) (*models.ResetPassword, error) {
+	resetPassword := models.ResetPassword{}
+	err := db.Model(models.ResetPassword{}).Where("token = ?", token).Take(&resetPassword).Error
+	if err != nil {
+		return nil, err
+	}
+	return &resetPassword, nil
 }
 
 func (d *ResetPasswordType) DeleteDetails(db *gorm.DB, resetPassword *models.ResetPassword) (int64, error) {

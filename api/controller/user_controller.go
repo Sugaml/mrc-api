@@ -57,12 +57,12 @@ func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
-	course, err := urepo.FindAll(server.DB)
+	users, err := urepo.FindAll(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	responses.JSON(w, http.StatusOK, users)
 }
 
 func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
