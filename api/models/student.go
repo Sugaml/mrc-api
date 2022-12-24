@@ -17,4 +17,5 @@ type Student struct {
 	Course         Course `gorm:"foreignkey:CID" json:"course"`
 	UserId         uint   `gorm:"user_id" json:"user_id"`
 	User           User   `gorm:"foreignkey:UserId" json:"user"`
+	IsApproved     bool   `gorm:"is_approved" json:"is_approved"`
 }

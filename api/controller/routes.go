@@ -33,7 +33,9 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/user", server.CreateUser, "POST")
 	server.setJSON("/user/login", server.GetLogin, "POST")
 	server.setJSON("/user", server.GetUserByID, "GET")
+	server.setJSON("/user/{id}", server.GetUser, "GET")
 	server.setJSON("/users", server.GetUsers, "GET")
+	server.setJSON("/user/{id}", server.GetUser, "GET")
 	server.setJSON("/user/{id}", server.UpdateUser, "PUT")
 	server.setJSON("/user/{id}", server.DeleteUser, "DELETE")
 	server.setJSON("/user/forgot-password", server.ForgotPassword, "POST")
@@ -98,6 +100,7 @@ func (server *Server) SetRoutes(path string, envValue string) {
 		_, _ = rw.Write(response)
 	})
 }
+
 func copyHeader(dst, src http.Header) {
 	for k, vv := range src {
 		for _, v := range vv {

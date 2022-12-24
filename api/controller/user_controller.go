@@ -56,6 +56,21 @@ func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, user)
 }
 
+func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
+}
+
 func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := urepo.FindAll(server.DB)
 	if err != nil {
