@@ -77,6 +77,37 @@ func (server *Server) UpdateStudentInfo(w http.ResponseWriter, r *http.Request) 
 	responses.JSON(w, http.StatusOK, studentUpdated)
 }
 
+func (server *Server) UpdateStudentStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cid, err := strconv.ParseUint(vars["sid"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	student, err := srepo.FindbyId(server.DB, uint(cid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	studentStatusRequest := &models.StudentStatusRequest{}
+	err = json.Unmarshal(body, studentStatusRequest)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	studentUpdated, err := srepo.UpdateStudentStatus(server.DB, student.ID, studentStatusRequest.Status)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, studentUpdated)
+}
+
 func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request) {
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
@@ -104,6 +135,15 @@ func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusCreated, student)
+}
+
+func (server *Server) ListStudents(w http.ResponseWriter, r *http.Request) {
+	students, err := srepo.FindAllStudent(server.DB)
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, students)
 }
 
 func (server *Server) DeleteStudent(w http.ResponseWriter, r *http.Request) {

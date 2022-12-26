@@ -13,6 +13,7 @@ type IStudent interface {
 	FindbyUserId(db *gorm.DB, uid uint) (*models.Student, error)
 	SaveStudent(db *gorm.DB, Student *models.Student) (*models.Student, error)
 	UpdateStudent(db *gorm.DB, Student *models.Student, cid uint) (*models.Student, error)
+	UpdateStudentStatus(db *gorm.DB, sid uint, status bool) (*models.Student, error)
 	DeleteStudent(db *gorm.DB, cid uint) (int64, error)
 }
 
@@ -69,6 +70,17 @@ func (cr *StudentRepo) SaveStudent(db *gorm.DB, data *models.Student) (*models.S
 
 func (cr *StudentRepo) UpdateStudent(db *gorm.DB, data *models.Student, cid uint) (*models.Student, error) {
 	err := db.Model(&models.Student{}).Where("id = ?", cid).Updates(data).Take(data).Error
+	if err != nil {
+		return &models.Student{}, err
+	}
+	return data, nil
+}
+
+func (sr *StudentRepo) UpdateStudentStatus(db *gorm.DB, sid uint, status bool) (*models.Student, error) {
+	data := &models.Student{}
+	err := db.Model(&models.Student{}).Where("id = ?", sid).UpdateColumn(map[string]interface{}{
+		"is_approved": status,
+	}).Take(data).Error
 	if err != nil {
 		return &models.Student{}, err
 	}

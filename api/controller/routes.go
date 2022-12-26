@@ -42,10 +42,12 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/user/reset-password", server.ResetPassword, "POST")
 
 	server.setJSON("/student_info", server.StudentInfo, "POST")
+	server.setJSON("/students", server.ListStudents, "GET")
 	server.setJSON("/student_info/{id}", server.StudentDetail, "GET")
 	server.setJSON("/student/general-info", server.StudentGeneralInfo, "GET")
 	server.setJSON("/student/address", server.StudentAddress, "POST")
 	server.setJSON("/student/education", server.StudentEducation, "POST")
+	server.setJSON("/student/{sid}/status", server.UpdateStudentStatus, "PUT")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")
 	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
 	server.setJSON("/student/{sid}/document", server.GetStudentFile, "GET")
