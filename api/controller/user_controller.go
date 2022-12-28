@@ -158,3 +158,34 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 		"user":  data,
 	})
 }
+
+func (server *Server) ActiveAndDeactiveUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(cid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	studentStatusRequest := &models.StudentStatusRequest{}
+	err = json.Unmarshal(body, studentStatusRequest)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	userUpdated, err := urepo.ActiveDeactiveUser(server.DB, user.ID, studentStatusRequest.Status)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, userUpdated)
+}

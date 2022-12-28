@@ -19,6 +19,8 @@ type IUser interface {
 	Save(db *gorm.DB, user *models.User) (*models.User, error)
 	Update(db *gorm.DB, user *models.User, uid uint) (*models.User, error)
 	UpdatePassword(db *gorm.DB, u *models.User) error
+	ActiveDeactiveUser(db *gorm.DB, sid uint, status bool) (*models.User, error)
+	MakeAdmin(db *gorm.DB, sid uint, status bool) (*models.User, error)
 	Delete(db *gorm.DB, uid uint) (int64, error)
 }
 
@@ -201,6 +203,28 @@ func (ur *UserRepo) UpdatePassword(db *gorm.DB, u *models.User) error {
 		return db.Error
 	}
 	return nil
+}
+
+func (ur *UserRepo) ActiveDeactiveUser(db *gorm.DB, sid uint, status bool) (*models.User, error) {
+	data := &models.User{}
+	err := db.Model(&models.User{}).Where("id = ?", sid).UpdateColumn(map[string]interface{}{
+		"active": status,
+	}).Take(data).Error
+	if err != nil {
+		return &models.User{}, err
+	}
+	return data, nil
+}
+
+func (ur *UserRepo) MakeAdmin(db *gorm.DB, sid uint, status bool) (*models.User, error) {
+	data := &models.User{}
+	err := db.Model(&models.User{}).Where("id = ?", sid).UpdateColumn(map[string]interface{}{
+		"is_admin": status,
+	}).Take(data).Error
+	if err != nil {
+		return &models.User{}, err
+	}
+	return data, nil
 }
 
 func (cr *UserRepo) Delete(db *gorm.DB, uid uint) (int64, error) {
