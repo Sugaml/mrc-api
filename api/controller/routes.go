@@ -37,6 +37,7 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/users", server.GetUsers, "GET")
 	server.setJSON("/user/{id}", server.GetUser, "GET")
 	server.setJSON("/user/{id}", server.UpdateUser, "PUT")
+	server.setJSON("/user/email/verify", server.UserEmailVerfy, "PUT")
 	server.setJSON("/user/{id}/active-deactive", server.ActiveAndDeactiveUser, "PUT")
 	server.setJSON("/user/{id}", server.DeleteUser, "DELETE")
 	server.setJSON("/user/forgot-password", server.ForgotPassword, "POST")

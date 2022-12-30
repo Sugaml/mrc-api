@@ -92,6 +92,25 @@ func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, users)
 }
 
+func (server *Server) UserEmailVerfy(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	_, err = urepo.VerifyEmail(server.DB, user.ID, true)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
+}
+
 func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uid, err := strconv.ParseUint(vars["id"], 10, 64)
