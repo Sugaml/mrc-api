@@ -8,6 +8,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type MailService interface {
+	SendVerifyEmail(to string, token string) error
+	SendResetPassword(to string, token string) error
+}
+
+type MailClient struct {
+	mailClient *mailjet.Client
+}
+
 func NewMail() (*mailjet.Client, error) {
 	err := godotenv.Load()
 	if err != nil {

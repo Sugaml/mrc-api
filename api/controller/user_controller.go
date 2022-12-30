@@ -2,7 +2,7 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,8 +10,10 @@ import (
 	"sugam-project/api/models"
 	"sugam-project/api/repository"
 	"sugam-project/api/responses"
+	"sugam-project/api/utils/mailer"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 var urepo = repository.NewUserRepo()
@@ -34,12 +36,22 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	course, err := urepo.Save(server.DB, data)
+	user, err := urepo.Save(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	token, err := auth.CreateToken(user.ID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = mailer.SendVerifyEmail(user.Email, token)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
@@ -147,7 +159,11 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	fmt.Println("Login user id :: ", data.ID)
+	if !data.EmailVerified {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("please verify your email"))
+		return
+	}
+	log.Info("Login user id :: ", data.ID)
 	token, err := auth.CreateToken(data.ID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)

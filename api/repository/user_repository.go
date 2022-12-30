@@ -20,7 +20,8 @@ type IUser interface {
 	Update(db *gorm.DB, user *models.User, uid uint) (*models.User, error)
 	UpdatePassword(db *gorm.DB, u *models.User) error
 	ActiveDeactiveUser(db *gorm.DB, sid uint, status bool) (*models.User, error)
-	MakeAdmin(db *gorm.DB, sid uint, status bool) (*models.User, error)
+	MakeAdmin(db *gorm.DB, uid uint, status bool) (*models.User, error)
+	VerifyEmail(db *gorm.DB, uid uint, status bool) (*models.User, error)
 	Delete(db *gorm.DB, uid uint) (int64, error)
 }
 
@@ -170,9 +171,12 @@ func (cr *UserRepo) FindbyUsername(db *gorm.DB, username string) (*models.User, 
 }
 
 func (cr *UserRepo) Save(db *gorm.DB, user *models.User) (*models.User, error) {
-	err := db.Model(&models.User{}).Create(&user).Error
+	err := BeforeSave(user)
 	if err != nil {
-		log.Error().AnErr("course save error ::", err)
+		return nil, err
+	}
+	err = db.Model(&models.User{}).Create(&user).Error
+	if err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -190,7 +194,6 @@ func (cr *UserRepo) Update(db *gorm.DB, user *models.User, uid uint) (*models.Us
 func (ur *UserRepo) UpdatePassword(db *gorm.DB, u *models.User) error {
 	err := BeforeSave(u)
 	if err != nil {
-		log.Error()
 		return err
 	}
 	db = db.Model(&models.User{}).Where("email = ?", u.Email).Take(&models.User{}).UpdateColumns(
@@ -216,10 +219,22 @@ func (ur *UserRepo) ActiveDeactiveUser(db *gorm.DB, sid uint, status bool) (*mod
 	return data, nil
 }
 
-func (ur *UserRepo) MakeAdmin(db *gorm.DB, sid uint, status bool) (*models.User, error) {
+func (ur *UserRepo) MakeAdmin(db *gorm.DB, uid uint, status bool) (*models.User, error) {
 	data := &models.User{}
-	err := db.Model(&models.User{}).Where("id = ?", sid).UpdateColumn(map[string]interface{}{
+	err := db.Model(&models.User{}).Where("id = ?", uid).UpdateColumn(map[string]interface{}{
 		"is_admin": status,
+	}).Take(data).Error
+	if err != nil {
+		return &models.User{}, err
+	}
+	return data, nil
+}
+
+func (ur *UserRepo) VerifyEmail(db *gorm.DB, uid uint, status bool) (*models.User, error) {
+	data := &models.User{}
+	err := db.Model(&models.User{}).Where("id = ?", uid).UpdateColumn(map[string]interface{}{
+		"email_verified": status,
+		"active":         true,
 	}).Take(data).Error
 	if err != nil {
 		return &models.User{}, err
