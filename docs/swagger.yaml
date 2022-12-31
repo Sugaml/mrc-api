@@ -1,0 +1,79 @@
+basePath: /
+definitions:
+  models.Course:
+    type: object
+host: mrc.babulal.com.np
+info:
+  contact:
+    email: info@mrc.com
+    name: API Support
+  description: mrc-api
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: mrc-api
+  version: 1.0.1
+paths:
+  /course:
+    post:
+      consumes:
+      - application/json
+      description: register to 01cloud
+      parameters:
+      - description: User register
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Course'
+      - description: Git Id
+        in: query
+        name: gitid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+      summary: register to 01cloud
+      tags:
+      - User
+  /courses:
+    get:
+      consumes:
+      - application/json
+      description: get accounts
+      parameters:
+      - description: name search by q
+        format: email
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Course'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List accounts
+      tags:
+      - accounts
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
