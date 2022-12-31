@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	"sugam-project/api/config"
@@ -12,27 +10,42 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
+
+// @title mrc-api
+// @version 1.0.1
+// @description mrc-api
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email info@mrc.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host mrc.babulal.com.np
+// @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("error in load env file %v", err)
+		logrus.Fatalf("error in load env file %v", err)
 	} else {
-		fmt.Println("Loaded env files...")
+		logrus.Info("Successfully loaded env file.")
 	}
 	conf, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	conn, err := gorm.Open(conf.DBDriver, conf.DBSource)
 	if err != nil {
-		log.Fatal("Cannot connect to db ", err)
+		logrus.Fatal("Cannot connect to db ", err)
 	}
 	pdb := postgres.NewDB(conn)
 	server, err := controller.NewServer(pdb.DB)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 		return
 	}
 	port := ":" + os.Getenv("PORT")
