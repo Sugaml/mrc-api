@@ -16,6 +16,16 @@ import (
 
 var repo = repository.NewCourseRepo()
 
+// Register godoc
+// @Summary register to 01cloud
+// @Description register to 01cloud
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param body body models.Course true "User register"
+// @Param gitid query string true "Git Id"
+// @Success 200 {object} models.Course
+// @Router /course [post]
 func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	err := server.CheckAdminAuthorization(r)
 	if err != nil {
@@ -47,6 +57,18 @@ func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, course)
 }
 
+// ListAccounts godoc
+// @Summary      List accounts
+// @Description  get accounts
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Param        q    query     string  false  "name search by q"  Format(email)
+// @Success      200  {array}   models.Course
+// @Failure      400
+// @Failure      404
+// @Failure      500
+// @Router       /courses [get]
 func (server *Server) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)

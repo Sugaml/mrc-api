@@ -9,6 +9,10 @@ import (
 	"sugam-project/api/auth"
 	"sugam-project/api/middleware"
 	"sugam-project/api/responses"
+
+	_ "sugam-project/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func (server *Server) setJSON(path string, next func(http.ResponseWriter, *http.Request), method string) {
@@ -21,10 +25,21 @@ func (server *Server) setAdmin(path string, next func(http.ResponseWriter, *http
 
 func (server *Server) initializeRoutes() {
 	server.Router.Use(middleware.CORS)
+
+	server.Router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL(os.Getenv("BASE_URL")+"/swagger/swagger.json"), //The url pointing to API definition
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("#swagger-ui"),
+	)).Methods(http.MethodGet)
+	// s := server.Router.PathPrefix("/api").Subrouter() //Base Path
+	// server.Router.PathPrefix("/uploads").Handler(http.FileServer(http.Dir("./uploads")))
+
 	server.setJSON("/", server.WelcomePage, "GET")
 	server.SetRoutes("/payment", "PAYMENT_SERVER_URL")
 
 	server.setJSON("/course", server.CreateCourse, "POST")
+	server.setJSON("/user/upload", server.handleFileupload, "POST")
 	server.setJSON("/course/{id}", server.GetCourseByID, "GET")
 	server.setJSON("/courses", server.GetCourses, "GET")
 	server.setAdmin("/course/{id}", server.UpdateCourse, "PUT")
