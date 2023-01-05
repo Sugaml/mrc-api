@@ -27,11 +27,12 @@ func (server *Server) initializeRoutes() {
 	server.Router.Use(middleware.CORS)
 
 	server.Router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(os.Getenv("BASE_URL")+"/swagger/swagger.json"), //The url pointing to API definition
+		httpSwagger.URL(os.Getenv("BASE_URL")+"/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("#swagger-ui"),
-	)).Methods(http.MethodGet)
+	))
+
 	// s := server.Router.PathPrefix("/api").Subrouter() //Base Path
 	// server.Router.PathPrefix("/uploads").Handler(http.FileServer(http.Dir("./uploads")))
 
@@ -67,6 +68,7 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/student/{sid}/status", server.UpdateStudentStatus, "PUT")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")
 	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
+	server.setJSON("/student/{sid}/education", server.GetStudentEducation, "GET")
 	server.setJSON("/student/{sid}/document", server.GetStudentFile, "GET")
 
 	server.setJSON("/student/{sid}", server.UpdateStudentInfo, "PUT")

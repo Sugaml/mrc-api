@@ -14,7 +14,7 @@
         },
         "version": "1.0.1"
     },
-    "host": "mrc.babulal.com.np",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/course": {

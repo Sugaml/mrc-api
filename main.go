@@ -21,7 +21,7 @@ import (
 // @contact.email info@mrc.com
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host mrc.babulal.com.np
+// @host localhost:8080
 // @BasePath /
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

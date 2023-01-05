@@ -48,12 +48,12 @@ func (server *Server) StudentEducation(w http.ResponseWriter, r *http.Request) {
 
 func (server *Server) GetStudentEducation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	cid, err := strconv.ParseUint(vars["sid"], 10, 64)
+	sid, err := strconv.ParseUint(vars["sid"], 10, 64)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	studentEdu, err := serepo.FindStudenEducationbyId(server.DB, uint(cid))
+	studentEdu, err := serepo.FindStudenEducationDetail(server.DB, uint(sid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return

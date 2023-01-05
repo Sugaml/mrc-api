@@ -9,6 +9,7 @@ import (
 
 type IStudentEducation interface {
 	FindStudenEducationbyId(db *gorm.DB, sid uint) (*models.StudentEducation, error)
+	FindStudenEducationDetail(db *gorm.DB, sid uint) (*[]models.StudentEducation, error)
 	SaveStudentEducation(db *gorm.DB, sedu *models.StudentEducation) (*models.StudentEducation, error)
 	UpdateStudentEducation(db *gorm.DB, sedu *models.StudentEducation, cid uint) (*models.StudentEducation, error)
 	DeleteStudentEducation(db *gorm.DB, sid uint) (int64, error)
@@ -28,6 +29,15 @@ func NewStudentEducation(data models.StudentFile) *models.StudentFile {
 func (cr *StudentEducationRepo) FindStudenEducationbyId(db *gorm.DB, sid uint) (*models.StudentEducation, error) {
 	data := &models.StudentEducation{}
 	err := db.Model(models.StudentEducation{}).Where("student_id = ?", sid).Take(&data).Error
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (cr *StudentEducationRepo) FindStudenEducationDetail(db *gorm.DB, sid uint) (*[]models.StudentEducation, error) {
+	data := &[]models.StudentEducation{}
+	err := db.Model(models.StudentEducation{}).Where("student_id = ?", sid).Find(data).Error
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,7 @@ basePath: /
 definitions:
   models.Course:
     type: object
-host: mrc.babulal.com.np
+host: localhost:8080
 info:
   contact:
     email: info@mrc.com
