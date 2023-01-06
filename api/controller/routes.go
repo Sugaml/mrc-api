@@ -26,15 +26,7 @@ func (server *Server) setAdmin(path string, next func(http.ResponseWriter, *http
 func (server *Server) initializeRoutes() {
 	server.Router.Use(middleware.CORS)
 
-	server.Router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(os.Getenv("BASE_URL")+"/swagger/doc.json"), //The url pointing to API definition
-		httpSwagger.DeepLinking(true),
-		httpSwagger.DocExpansion("none"),
-		httpSwagger.DomID("#swagger-ui"),
-	))
-
-	// s := server.Router.PathPrefix("/api").Subrouter() //Base Path
-	// server.Router.PathPrefix("/uploads").Handler(http.FileServer(http.Dir("./uploads")))
+	server.Router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
 	server.setJSON("/", server.WelcomePage, "GET")
 	server.SetRoutes("/payment", "PAYMENT_SERVER_URL")
