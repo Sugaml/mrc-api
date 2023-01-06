@@ -2,7 +2,7 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,8 +10,10 @@ import (
 	"sugam-project/api/models"
 	"sugam-project/api/repository"
 	"sugam-project/api/responses"
+	"sugam-project/api/utils/mailer"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 var urepo = repository.NewUserRepo()
@@ -34,36 +36,79 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	course, err := urepo.Save(server.DB, data)
+	user, err := urepo.Save(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	token, err := auth.CreateToken(user.ID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = mailer.SendVerifyEmail(user.Email, token)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
+}
+
+func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uid, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	course, err := urepo.FindbyId(server.DB, uint(uid))
+	user, err := urepo.FindbyId(server.DB, uint(uid))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	responses.JSON(w, http.StatusOK, user)
 }
 
 func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
-	course, err := urepo.FindAll(server.DB)
+	users, err := urepo.FindAll(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	responses.JSON(w, http.StatusOK, users)
+}
+
+func (server *Server) UserEmailVerfy(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	_, err = urepo.VerifyEmail(server.DB, user.ID, true)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
 }
 
 func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +178,11 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	fmt.Println("Login user id :: ", data.ID)
+	if !data.EmailVerified {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("please verify your email"))
+		return
+	}
+	log.Info("Login user id :: ", data.ID)
 	token, err := auth.CreateToken(data.ID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -143,4 +192,35 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 		"token": token,
 		"user":  data,
 	})
+}
+
+func (server *Server) ActiveAndDeactiveUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	user, err := urepo.FindbyId(server.DB, uint(cid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	studentStatusRequest := &models.StudentStatusRequest{}
+	err = json.Unmarshal(body, studentStatusRequest)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	userUpdated, err := urepo.ActiveDeactiveUser(server.DB, user.ID, studentStatusRequest.Status)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, userUpdated)
 }

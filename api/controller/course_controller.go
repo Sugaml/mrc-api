@@ -16,6 +16,16 @@ import (
 
 var repo = repository.NewCourseRepo()
 
+// CreateCoursse godoc
+// @Summary Create a new Course
+// @Description Create a new Course with the input payload
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param body body models.Course true "Create Course"
+// @Success 201 {object} models.Course
+// @Router /course [post]
 func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	err := server.CheckAdminAuthorization(r)
 	if err != nil {
@@ -27,6 +37,7 @@ func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	defer r.Body.Close()
 	data := &models.Course{}
 	err = json.Unmarshal(body, data)
 	if err != nil {
@@ -46,6 +57,16 @@ func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, course)
 }
 
+// GetCourse godoc
+// @Summary Get Course by id
+// @Description Get Course by id from token
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "course id"
+// @Success 200 {object} models.Course
+// @Router /course/{id} [get]
 func (server *Server) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)
@@ -131,7 +152,6 @@ func (server *Server) CheckAuthorization(r *http.Request) error {
 }
 
 func (server *Server) CheckAdminAuthorization(r *http.Request) error {
-	fmt.Print("init...")
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
 		return err

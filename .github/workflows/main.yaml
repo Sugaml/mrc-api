@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    tags:
+    - '*'
+    branches:
+    - 'develop' 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: build_push_branch
+      if: contains(github.ref, 'develop')
+      env:
+        GCR_CREDENTIAL: ${{ secrets.GCR_CRED }}
+      run: |
+             echo 'Docker login'
+             docker login -u "$(echo $DOCKER_USERNAME)" -p "$(echo $DOCKER_CREDENTIAL)" https://docker.io
+             echo 'Running build...'
+             docker build . -t sugamdocker35/mrc/mrc-api:${{ github.sha }}
+             echo 'Pushing Image...'
+             docker push sugamdocker35/mrc/mrc-api:${{ github.sha }}
+             echo 'Done!'
+
+    - name: build_push_tag
+      if: contains(github.ref, 'tags')
+      env:
+        GCR_CREDENTIAL: ${{ secrets.GCR_CRED }}
+      run: |
+             echo 'Docker login'
+             docker login -u "$(echo $DOCKER_USERNAME)" -p "$(echo $DOCKER_CREDENTIAL)" https://docker.io
+             echo 'Running build...'
+             docker build . -t gcr.io/zerone-devops-labs/mrc-api:${GITHUB_REF:10}
+             echo 'Pushing Image...'
+             docker push gcr.io/zerone-devops-labs/mrc-api:${GITHUB_REF:10}
+             echo 'Done!'
+
+    - name: Get the version
+      if: contains(github.ref,'tags')
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF:10}
+
+    - uses: actions-hub/kubectl@master
+      name: Deploy_Branch
+      if: contains(github.ref,'develop')
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+      with:
+        args: set image deployment/mrc-api mrc-api=sugamdocker35/mrc/mrc-api:${{ github.sha }} -n mrc
+
+    - uses: actions-hub/kubectl@master
+      name: Deploy_Tag
+      if: contains(github.ref, 'tags')
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+      with:
+        args: set image deployment/mrc-api-stable mrc-api-stable=sugamdocker35/mrc/mrc-api:${{ steps.get_version.outputs.VERSION }} -n mrc-stable

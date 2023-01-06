@@ -14,5 +14,12 @@ type Student struct {
 	ParanetMobile  string `gorm:"parent_mobile" json:"parent_mobile"`
 	ParentRelation string `gorm:"parent_relation" json:"parent_relation"`
 	CID            uint   `gorm:"cid" json:"cid"`
-	Course         Course ` json:"course"`
+	Course         Course `gorm:"foreignkey:CID" json:"course"`
+	UserId         uint   `gorm:"user_id" json:"user_id"`
+	User           User   `gorm:"foreignkey:UserId" json:"user"`
+	IsApproved     bool   `gorm:"is_approved;default:false" json:"is_approved"`
+}
+
+type StudentStatusRequest struct {
+	Status bool `json:"status"`
 }

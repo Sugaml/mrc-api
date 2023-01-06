@@ -15,9 +15,10 @@ type User struct {
 	Username      string `json:"username"`
 	Password      string `json:"password"`
 	Role          string `json:"role"`
+	Image         string `json:"image"`
 	IsAdmin       bool   `json:"is_admin"`
 	Active        bool   `json:"active"`
-	EmailVerified bool   `json:"email_verified"`
+	EmailVerified bool   `gorm:"default:false" json:"email_verified"`
 	IsStudent     bool   `json:"is_student"`
 }
 
