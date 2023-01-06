@@ -2,7 +2,7 @@ basePath: /
 definitions:
   models.Course:
     type: object
-host: localhost:8080
+host: api.mrc.babulal.com.np
 info:
   contact:
     email: info@mrc.com
@@ -19,19 +19,37 @@ paths:
     post:
       consumes:
       - application/json
-      description: register to 01cloud
+      description: Create a new Course with the input payload
       parameters:
-      - description: User register
+      - description: Create Course
         in: body
         name: body
         required: true
         schema:
           $ref: '#/definitions/models.Course'
-      - description: Git Id
-        in: query
-        name: gitid
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Course'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new Course
+      tags:
+      - Course
+  /course/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Course by id from token
+      parameters:
+      - description: course id
+        in: path
+        name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -39,38 +57,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Course'
-      summary: register to 01cloud
+      security:
+      - ApiKeyAuth: []
+      summary: Get Course by id
       tags:
-      - User
-  /courses:
-    get:
-      consumes:
-      - application/json
-      description: get accounts
-      parameters:
-      - description: name search by q
-        format: email
-        in: query
-        name: q
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Course'
-            type: array
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      summary: List accounts
-      tags:
-      - accounts
+      - Course
 securityDefinitions:
   ApiKeyAuth:
     in: header

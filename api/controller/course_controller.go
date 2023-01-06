@@ -16,15 +16,15 @@ import (
 
 var repo = repository.NewCourseRepo()
 
-// Register godoc
-// @Summary register to 01cloud
-// @Description register to 01cloud
-// @Tags User
+// CreateCoursse godoc
+// @Summary Create a new Course
+// @Description Create a new Course with the input payload
+// @Tags Course
 // @Accept  json
 // @Produce  json
-// @Param body body models.Course true "User register"
-// @Param gitid query string true "Git Id"
-// @Success 200 {object} models.Course
+// @Security ApiKeyAuth
+// @Param body body models.Course true "Create Course"
+// @Success 201 {object} models.Course
 // @Router /course [post]
 func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	err := server.CheckAdminAuthorization(r)
@@ -57,18 +57,16 @@ func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, course)
 }
 
-// ListAccounts godoc
-// @Summary      List accounts
-// @Description  get accounts
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        q    query     string  false  "name search by q"  Format(email)
-// @Success      200  {array}   models.Course
-// @Failure      400
-// @Failure      404
-// @Failure      500
-// @Router       /courses [get]
+// GetCourse godoc
+// @Summary Get Course by id
+// @Description Get Course by id from token
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "course id"
+// @Success 200 {object} models.Course
+// @Router /course/{id} [get]
 func (server *Server) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)

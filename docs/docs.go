@@ -26,7 +26,12 @@ const docTemplate = `{
     "paths": {
         "/course": {
             "post": {
-                "description": "register to 01cloud",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new Course with the input payload",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,24 +39,54 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Course"
                 ],
-                "summary": "register to 01cloud",
+                "summary": "Create a new Course",
                 "parameters": [
                     {
-                        "description": "User register",
+                        "description": "Create Course",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.Course"
                         }
-                    },
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Course"
+                        }
+                    }
+                }
+            }
+        },
+        "/course/{id}": {
+            "get": {
+                "security": [
                     {
-                        "type": "string",
-                        "description": "Git Id",
-                        "name": "gitid",
-                        "in": "query",
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get Course by id from token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Get Course by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -61,50 +96,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Course"
                         }
-                    }
-                }
-            }
-        },
-        "/courses": {
-            "get": {
-                "description": "get accounts",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "accounts"
-                ],
-                "summary": "List accounts",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "name search by q",
-                        "name": "q",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Course"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -127,7 +118,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.1",
-	Host:             "localhost:8080",
+	Host:             "api.mrc.babulal.com.np",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "mrc-api",
