@@ -30,6 +30,7 @@ func (server *Server) initializeRoutes() {
 
 	server.setJSON("/", server.WelcomePage, "GET")
 	server.SetRoutes("/payment", "PAYMENT_SERVER_URL")
+	server.SetRoutes("/uploads", "UPLOAD_SERVER_URL")
 
 	server.setJSON("/course", server.CreateCourse, "POST")
 	server.setJSON("/user/upload", server.handleFileupload, "POST")
