@@ -36,6 +36,11 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
+	_, err = urepo.FindbyUsername(server.DB, data.Email)
+	if err == nil {
+		responses.ERROR(w, http.StatusConflict, errors.New("already registered email"))
+		return
+	}
 	user, err := urepo.Save(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
