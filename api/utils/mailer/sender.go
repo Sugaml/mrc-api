@@ -37,14 +37,7 @@ func NewGmailSender(name string, fromEmailAddress string, fromEmailPassword stri
 	}
 }
 
-func (sender *GmailSender) SendEmail(
-	subject string,
-	content string,
-	to []string,
-	cc []string,
-	bcc []string,
-	attachFiles []string,
-) error {
+func (sender *GmailSender) SendEmail(subject string, content string, to []string, cc []string, bcc []string, attachFiles []string) error {
 	e := email.NewEmail()
 	e.From = fmt.Sprintf("%s <%s>", sender.name, sender.fromEmailAddress)
 	e.Subject = subject
