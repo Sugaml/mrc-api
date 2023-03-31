@@ -10,7 +10,7 @@ type User struct {
 	gorm.Model
 	Email         string `json:"email"`
 	Username      string `json:"username"`
-	Password      string `json:"-"`
+	Password      string `json:"password"`
 	Role          string `json:"role"`
 	Image         string `json:"image"`
 	IsAdmin       bool   `json:"is_admin"`
