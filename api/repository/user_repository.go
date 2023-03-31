@@ -56,8 +56,6 @@ func VerifyPassword(hashedPassword, password string) error {
 
 func Prepares(u *models.User) {
 	u.ID = 0
-	u.FirstName = html.EscapeString(strings.TrimSpace(u.FirstName))
-	u.LastName = html.EscapeString(strings.TrimSpace(u.LastName))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()

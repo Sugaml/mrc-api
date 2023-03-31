@@ -82,6 +82,15 @@ func (server *Server) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, course)
 }
 
+// GetCourses godoc
+// @Summary List Course
+// @Description Get list courses from.
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Success 200 {array} models.Course
+// @Router /courses [get]
 func (server *Server) GetCourses(w http.ResponseWriter, r *http.Request) {
 	course, err := repo.FindAllCourse(server.DB)
 	if err != nil {
@@ -91,6 +100,17 @@ func (server *Server) GetCourses(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, course)
 }
 
+// UpdateCourse godoc
+// @Summary Update a Course
+// @Description Update a Course with the input payload
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "course id"
+// @Param body body models.Course true "Update Course"
+// @Success 200 {object} models.Course
+// @Router /courses/{id} [put]
 func (server *Server) UpdateCourse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)
@@ -121,6 +141,16 @@ func (server *Server) UpdateCourse(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, courseUpdated)
 }
 
+// DeleteCourse godoc
+// @Summary Delete a Course
+// @Description Delete a Course with the input payload
+// @Tags Course
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "Course id"
+// @Success 204 {object} models.Course
+// @Router /course/{id} [delete]
 func (server *Server) DeleteCourse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, err := strconv.ParseUint(vars["id"], 10, 64)

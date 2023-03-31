@@ -2,6 +2,8 @@ basePath: /
 definitions:
   models.Course:
     type: object
+  models.Student:
+    type: object
 host: api.mrc.babulal.com.np
 info:
   contact:
@@ -40,6 +42,28 @@ paths:
       tags:
       - Course
   /course/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Course with the input payload
+      parameters:
+      - description: Course id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Course'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a Course
+      tags:
+      - Course
     get:
       consumes:
       - application/json
@@ -62,6 +86,101 @@ paths:
       summary: Get Course by id
       tags:
       - Course
+  /courses:
+    get:
+      consumes:
+      - application/json
+      description: Get list courses from.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Course'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: List Course
+      tags:
+      - Course
+  /courses/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a Course with the input payload
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Course
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Course'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a Course
+      tags:
+      - Course
+  /student:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Student with the input payload
+      parameters:
+      - description: Create Student
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new Student
+      tags:
+      - Student
+  /student/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Student by id from token
+      parameters:
+      - description: Student id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Student'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Student by id
+      tags:
+      - Student
 securityDefinitions:
   ApiKeyAuth:
     in: header

@@ -8,18 +8,14 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName     string `json:"firstname"`
-	LastName      string `json:"lastname"`
 	Email         string `json:"email"`
-	MobileNumber  int64  `json:"mobile_number"`
 	Username      string `json:"username"`
-	Password      string `json:"password"`
+	Password      string `json:"-"`
 	Role          string `json:"role"`
 	Image         string `json:"image"`
 	IsAdmin       bool   `json:"is_admin"`
 	Active        bool   `json:"active"`
 	EmailVerified bool   `gorm:"default:false" json:"email_verified"`
-	IsStudent     bool   `json:"is_student"`
 }
 
 func (user *User) Prepare() {
@@ -29,12 +25,6 @@ func (user *User) Prepare() {
 }
 
 func (user *User) Validate() error {
-	if user.FirstName == "" {
-		return errors.New("required firstname")
-	}
-	if user.LastName == "" {
-		return errors.New("required lastname")
-	}
 	if user.Email == "" {
 		return errors.New("required email")
 	}

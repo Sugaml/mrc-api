@@ -10,8 +10,6 @@ import (
 
 var users = []models.User{
 	{
-		FirstName:     "admin",
-		LastName:      "admin",
 		Email:         "admin@admin.com",
 		Password:      "admin",
 		IsAdmin:       true,

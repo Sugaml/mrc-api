@@ -15,6 +15,16 @@ import (
 
 var srepo = repository.NewStudentRepo()
 
+// CreateStudent godoc
+// @Summary Create a new Student
+// @Description Create a new Student with the input payload
+// @Tags Student
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param body body models.Student true "Create Student"
+// @Success 201 {object} models.Student
+// @Router /student [post]
 func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
@@ -108,6 +118,16 @@ func (server *Server) UpdateStudentStatus(w http.ResponseWriter, r *http.Request
 	responses.JSON(w, http.StatusOK, studentUpdated)
 }
 
+// GetCourse godoc
+// @Summary Get Student by id
+// @Description Get Student by id from token
+// @Tags Student
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "Student id"
+// @Success 200 {object} models.Student
+// @Router /student/{id} [get]
 func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request) {
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
