@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -57,19 +56,19 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	sender := mailer.NewGmailSender("Babulal", "tamangsugam09@gmail.com", "eokbjhvwagftsaca")
-	subject := "A test email"
-	content := `
-	<h1>Welcome to page</h1>
-	`
-	to := []string{data.Email}
-	attachFiles := []string{}
-	err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
-	if err != nil {
-		fmt.Print(fmt.Errorf("error to send email", err))
-		return
-	}
-	fmt.Print("Success")
+	// sender := mailer.NewGmailSender("Babulal", "tamangsugam09@gmail.com", "eokbjhvwagftsaca")
+	// subject := "A test email"
+	// content := `
+	// <h1>Welcome to page</h1>
+	// `
+	// to := []string{data.Email}
+	// attachFiles := []string{}
+	// err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
+	// if err != nil {
+	// 	fmt.Print(fmt.Errorf("error to send email", err))
+	// 	return
+	// }
+	// fmt.Print("Success")
 	responses.JSON(w, http.StatusCreated, user)
 }
 
@@ -207,19 +206,19 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	sender := mailer.NewGmailSender("Babulal", "tamangsugam09@gmail.com", "eokbjhvwagftsaca")
-	subject := "A test email"
-	content := `
-	<h1>Welcome to page</h1>
-	`
-	to := []string{data.Email}
-	attachFiles := []string{}
-	err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
-	if err != nil {
-		fmt.Print(fmt.Errorf("error to send email", err))
-		return
-	}
-	fmt.Print("Success")
+	// sender := mailer.NewGmailSender("Babulal", "tamangsugam09@gmail.com", "eokbjhvwagftsaca")
+	// subject := "A test email"
+	// content := `
+	// <h1>Welcome to page</h1>
+	// `
+	// to := []string{data.Email}
+	// attachFiles := []string{}
+	// err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
+	// if err != nil {
+	// 	fmt.Print(fmt.Errorf("error to send email", err))
+	// 	return
+	// }
+	// fmt.Print("Success")
 	responses.JSON(w, http.StatusOK, map[string]interface{}{
 		"token": token,
 		"user":  data,
