@@ -21,6 +21,7 @@ type User struct {
 func (user *User) Prepare() {
 	user.ID = 0
 	user.Active = true
+	user.EmailVerified = true
 	user.IsAdmin = false
 }
 
