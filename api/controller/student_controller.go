@@ -43,11 +43,11 @@ func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// data.Prepare()
-	// err = data.Validate()
-	// if err != nil {
-	// 	responses.ERROR(w, http.StatusBadRequest, err)
-	// 	return
-	// }
+	err = data.Validate()
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
 	data.UserId = uid
 	course, err := srepo.SaveStudent(server.DB, data)
 	if err != nil {

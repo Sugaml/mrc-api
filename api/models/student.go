@@ -1,6 +1,10 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Student struct {
 	gorm.Model
@@ -22,4 +26,24 @@ type Student struct {
 
 type StudentStatusRequest struct {
 	Status bool `json:"status"`
+}
+
+func NewStudent(id uint, req *UserRequest) *Student {
+	return &Student{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+		Gender:    req.Gender,
+		UserId:    id,
+	}
+}
+
+func (user *Student) Validate() error {
+	if user.FirstName == "" {
+		return errors.New("required first name")
+	}
+	if user.LastName == "" {
+		return errors.New("required last name")
+	}
+	return nil
 }

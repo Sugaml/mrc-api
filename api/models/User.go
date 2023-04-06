@@ -18,6 +18,27 @@ type User struct {
 	EmailVerified bool   `gorm:"default:false" json:"email_verified"`
 }
 
+type UserRequest struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Gender    string `gorm:"gender" json:"gender"`
+	Role      string `json:"role"`
+	Image     string `json:"image"`
+}
+
+func NewUser(req *UserRequest) *User {
+	return &User{
+		Email:    req.Email,
+		Username: req.Email,
+		Password: req.Password,
+		Role:     req.Role,
+		Image:    req.Image,
+	}
+}
+
 func (user *User) Prepare() {
 	user.ID = 0
 	user.Active = true
@@ -29,11 +50,11 @@ func (user *User) Validate() error {
 	if user.Email == "" {
 		return errors.New("required email")
 	}
-	// if user.Username == "" {
-	// 	return errors.New("required username")
-	// }
 	if user.Password == "" {
 		return errors.New("required password")
+	}
+	if len(user.Password) < 8 {
+		return errors.New("password should be atleast 8 characters")
 	}
 	return nil
 }

@@ -24,24 +24,30 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	data := &models.User{}
-	err = json.Unmarshal(body, data)
+	req := &models.UserRequest{}
+	err = json.Unmarshal(body, req)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	data := models.NewUser(req)
 	data.Prepare()
 	err = data.Validate()
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	_, err = urepo.FindbyUsername(server.DB, data.Email)
+	_, err = urepo.FindbyUsername(server.DB, req.Email)
 	if err == nil {
 		responses.ERROR(w, http.StatusConflict, errors.New("already registered email"))
 		return
 	}
 	user, err := urepo.Save(server.DB, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	_, err = srepo.SaveStudent(server.DB, models.NewStudent(user.ID, req))
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return

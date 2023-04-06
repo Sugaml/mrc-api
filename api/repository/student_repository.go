@@ -26,8 +26,9 @@ func NewStudentRepo() IStudent {
 
 func NewStudent(data models.Student) *models.Student {
 	return &models.Student{
-		FirstName: data.FirstName,
-		LastName:  data.LastName,
+		FirstName:  data.FirstName,
+		LastName:   data.LastName,
+		data.Email: data.Email,
 	}
 }
 
