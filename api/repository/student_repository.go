@@ -24,14 +24,6 @@ func NewStudentRepo() IStudent {
 	return &StudentRepo{}
 }
 
-func NewStudent(data models.Student) *models.Student {
-	return &models.Student{
-		FirstName:  data.FirstName,
-		LastName:   data.LastName,
-		data.Email: data.Email,
-	}
-}
-
 func (cr *StudentRepo) FindAllStudent(db *gorm.DB) (*[]models.Student, error) {
 	datas := &[]models.Student{}
 	err := db.Model(&models.Student{}).Find(&datas).Error
