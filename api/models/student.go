@@ -8,8 +8,8 @@ import (
 
 type Student struct {
 	gorm.Model
-	FirstName      string `gorm:"first_name" json:"first_name"`
-	LastName       string `gorm:"last_name" json:"last_name"`
+	FirstName      string `gorm:"first_name" json:"firstname"`
+	LastName       string `gorm:"last_name" json:"lastname"`
 	Gender         string `gorm:"gender" json:"gender"`
 	DOB            string `gorm:"dob" json:"dob"`
 	MobileNumber   string `gorm:"mobile_num" json:"mobile_num"`
