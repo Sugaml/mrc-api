@@ -1,7 +1,18 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
+	"sugam-project/api/auth"
+	"sugam-project/api/repository"
+	"sugam-project/api/responses"
+
+	"github.com/jinzhu/gorm"
+)
+
+var (
+	DB    *gorm.DB
+	urepo = repository.NewUserRepo()
 )
 
 func SetMiddlewareJSON(next http.HandlerFunc) http.HandlerFunc {
@@ -16,14 +27,27 @@ func SetMiddlewareJSON(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func SetAdminMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		role := r.Header.Get("x-user-role")
-		if role != "ADMIN" {
-			rw.WriteHeader(http.StatusUnauthorized)
-			_, _ = rw.Write([]byte("Unauthorized"))
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := auth.TokenValid(r)
+		if err != nil {
+			responses.ERROR(w, http.StatusUnauthorized, err)
 			return
 		}
-		next.ServeHTTP(rw, r)
+		userId, err := auth.ExtractTokenID(r)
+		if err != nil {
+			responses.ERROR(w, http.StatusBadRequest, err)
+			return
+		}
+		user, err := urepo.FindbyId(DB, uint(userId))
+		if err != nil {
+			responses.ERROR(w, http.StatusNotFound, err)
+			return
+		}
+		if !user.IsAdmin {
+			responses.ERROR(w, http.StatusUnauthorized, errors.New("you are not authorized to use this api"))
+			return
+		}
+		next.ServeHTTP(w, r)
 	}
 }
 

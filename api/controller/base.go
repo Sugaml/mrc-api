@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"os"
+	"sugam-project/api/middleware"
 	"sugam-project/api/repository"
 	"sugam-project/api/utils/storage"
 
@@ -23,6 +24,7 @@ func NewServer(db *gorm.DB) (*Server, error) {
 		DB:     db,
 		Router: mux.NewRouter(),
 	}
+	middleware.DB = server.DB
 	repository.Migrate(&repository.Repository{DB: server.DB})
 	server.initializeRoutes()
 	stoarageClient, err := storage.NewStorage(os.Getenv("STORAGE_TYPE"))
