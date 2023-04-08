@@ -8,6 +8,7 @@ import (
 	"sugam-project/api/models"
 	"sugam-project/api/repository"
 	"sugam-project/api/responses"
+	"sugam-project/api/utils/mailer"
 
 	"github.com/gorilla/mux"
 )
@@ -41,6 +42,16 @@ func (server *Server) StudentEducation(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		studenEdu = append(studenEdu, *sedu)
+	}
+	student, err := srepo.FindbyId(server.DB, datas[0].ID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = mailer.SendStudentEnrollCompletedEmail(student.Email, student.FirstName+" "+student.LastName)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	responses.JSON(w, http.StatusCreated, studenEdu)
@@ -88,6 +99,7 @@ func (server *Server) UpdateStudentEducation(w http.ResponseWriter, r *http.Requ
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
+
 	responses.JSON(w, http.StatusOK, studentEduUpdated)
 }
 
