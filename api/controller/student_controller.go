@@ -9,6 +9,7 @@ import (
 	"sugam-project/api/models"
 	"sugam-project/api/repository"
 	"sugam-project/api/responses"
+	"sugam-project/api/utils/mailer"
 
 	"github.com/gorilla/mux"
 )
@@ -124,6 +125,13 @@ func (server *Server) UpdateStudentStatus(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
+	}
+	if studentUpdated.Email != "" {
+		err = mailer.SendStudentEnrollCompletedEmail(studentUpdated.Email, student.FirstName+" "+studentUpdated.LastName)
+		if err != nil {
+			responses.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
 	}
 	responses.JSON(w, http.StatusOK, studentUpdated)
 }

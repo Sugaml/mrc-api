@@ -107,3 +107,36 @@ func SendStudentEnrollCompletedEmail(to string, name string) error {
 	logrus.Info("enrolled completed mail successfully sent.", res)
 	return nil
 }
+
+func SendStudentEnrollApprovedEmail(to string, name string) error {
+	mailjetClient, err := NewMail()
+	if err != nil {
+		return err
+	}
+	messagesInfo := []mailjet.InfoMessagesV31{
+		{
+			Priority: 1,
+			From: &mailjet.RecipientV31{
+				Email: "tamangsugam09@gmail.com",
+				Name:  "Sugam Lama",
+			},
+			To: &mailjet.RecipientsV31{
+				mailjet.RecipientV31{
+					Email: to,
+					Name:  "User",
+				},
+			},
+			Subject:  "Confirmation of Approved Enrollment Form",
+			TextPart: "Hello  " + name,
+			HTMLPart: "<h3>I am pleased to inform you that your enrollment form has been approved and you are now officially enrolled in BICT. Congratulations on taking this important step towards achieving your academic and professional goals!</h3><br/><h3>If you have any questions or concerns, please do not hesitate to reach out to us at support@mrc.com. We are here to support you throughout your academic journey.</h3><br/><h3>MRC</h3>",
+		},
+	}
+	messages := mailjet.MessagesV31{Info: messagesInfo}
+	res, err := mailjetClient.SendMailV31(&messages)
+	if err != nil {
+		logrus.Error("Error to send email ", err)
+		return err
+	}
+	logrus.Info("enrolled completed mail successfully sent.", res)
+	return nil
+}
