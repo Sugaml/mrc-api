@@ -42,7 +42,6 @@ func NewUser(req *UserRequest) *User {
 func (user *User) Prepare() {
 	user.ID = 0
 	user.Active = true
-	user.EmailVerified = true
 	user.IsAdmin = false
 }
 

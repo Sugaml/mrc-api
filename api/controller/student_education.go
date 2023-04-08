@@ -11,6 +11,7 @@ import (
 	"sugam-project/api/utils/mailer"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 var serepo = repository.NewStudentEducationRepo()
@@ -43,9 +44,10 @@ func (server *Server) StudentEducation(w http.ResponseWriter, r *http.Request) {
 		}
 		studenEdu = append(studenEdu, *sedu)
 	}
-	student, err := srepo.FindbyId(server.DB, datas[0].ID)
+	logrus.Info("Student is in education :: ", datas[0].StudentID)
+	student, err := srepo.FindbyId(server.DB, datas[0].StudentID)
 	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
+		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
 	err = mailer.SendStudentEnrollCompletedEmail(student.Email, student.FirstName+" "+student.LastName)
