@@ -14,6 +14,7 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var urepo = repository.NewUserRepo()
@@ -200,6 +201,11 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 	data, err := urepo.FindbyUsername(server.DB, user.Username)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	err = repository.VerifyPassword(data.Password, user.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("incorrect password "))
 		return
 	}
 	if !data.EmailVerified {
