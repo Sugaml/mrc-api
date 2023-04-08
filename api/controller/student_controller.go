@@ -127,7 +127,7 @@ func (server *Server) UpdateStudentStatus(w http.ResponseWriter, r *http.Request
 		return
 	}
 	if studentUpdated.Email != "" {
-		err = mailer.SendStudentEnrollCompletedEmail(studentUpdated.Email, student.FirstName+" "+studentUpdated.LastName)
+		err = mailer.SendStudentEnrollApprovedEmail(studentUpdated.Email, student.FirstName+" "+studentUpdated.LastName)
 		if err != nil {
 			responses.ERROR(w, http.StatusInternalServerError, err)
 			return
