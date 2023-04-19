@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  models.ChangePasswordRequest:
+    properties:
+      confirm_password:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
   models.Course:
     type: object
   models.Student:
@@ -181,6 +190,35 @@ paths:
       summary: Get Student by id
       tags:
       - Student
+  /users/{id}/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change Password with the input payload
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Chanage Password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Course'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChangePasswordRequest'
+      security:
+      - ApiKeyAuth: []
+      summary: Change Password
+      tags:
+      - User
 securityDefinitions:
   ApiKeyAuth:
     in: header
