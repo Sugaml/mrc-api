@@ -48,6 +48,27 @@ func (server *Server) StudentFileInfo(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, sfile)
 }
 
+func (server *Server) StudentDocument(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	defer r.Body.Close()
+	data := &models.StudentFile{}
+	err = json.Unmarshal(body, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	sfile, err := sfrepo.SaveStudentFile(server.DB, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, sfile)
+}
+
 func (server *Server) UpdateStudentFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sid, err := strconv.ParseUint(vars["sid"], 10, 64)

@@ -60,6 +60,7 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/student/general-info", server.StudentGeneralInfo, "GET")
 	server.setJSON("/student/address", server.StudentAddress, "POST")
 	server.setJSON("/student/education", server.StudentEducation, "POST")
+	server.setJSON("/student/document", server.StudentDocument, "POST")
 	server.setJSON("/student/{sid}/status", server.UpdateStudentStatus, "PUT")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")
 	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
