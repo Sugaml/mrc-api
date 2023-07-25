@@ -12,7 +12,6 @@ import (
 
 	_ "sugam-project/docs"
 
-	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -94,12 +93,12 @@ func (server *Server) SetRoutes(path string, envValue string) {
 		copyHeader(proxyReq.Header, r.Header)
 		userId, _ := auth.ExtractTokenID(r)
 		if userId != 0 {
-			userGotten, _ := urepo.FindbyId(server.DB, userId)
-			if userGotten != nil {
-				logrus.Infof("proxy passed by :: %s :: %w", userGotten.ID, userGotten.IsAdmin)
+			user, _ := urepo.FindbyId(server.DB, userId)
+			if user != nil {
+				proxyReq.Header.Set("x-user-id", fmt.Sprint(userId))
+				proxyReq.Header.Set("X-USER-FOLDER", fmt.Sprintf("user-bucket-%d", user.ID))
 			}
-			proxyReq.Header.Set("x-user-id", fmt.Sprint(userId))
-			if userGotten != nil && userGotten.IsAdmin {
+			if user != nil && user.IsAdmin {
 				proxyReq.Header.Set("x-user-role", "ADMIN")
 			}
 		}
