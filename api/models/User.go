@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 	"unicode"
 
 	"github.com/jinzhu/gorm"
@@ -28,6 +29,30 @@ type UserRequest struct {
 	Gender    string `gorm:"gender" json:"gender"`
 	Role      string `json:"role"`
 	Image     string `json:"image"`
+}
+
+type UserResponse struct {
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	FirstName string    `json:"firstname"`
+	LastName  string    `json:"lastname"`
+	Email     string    `json:"email"`
+	Username  string    `json:"username"`
+	Gender    string    `gorm:"gender" json:"gender"`
+	Role      string    `json:"role"`
+	Image     string    `json:"image"`
+}
+
+func (u *User) GetUsername() string {
+	return u.Username
+}
+
+func (u *User) GetEmail() string {
+	return u.Email
+}
+
+func (u *User) GetRole() string {
+	return u.Role
 }
 
 func NewUser(req *UserRequest) *User {

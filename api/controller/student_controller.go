@@ -157,7 +157,12 @@ func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request)
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, student)
+	response := models.StudentResponse{}
+	if err = models.JSONModelConverter(student, response); err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, student)
 }
 
 func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
@@ -172,7 +177,7 @@ func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, student)
+	responses.JSON(w, http.StatusOK, student)
 }
 
 func (server *Server) ListStudents(w http.ResponseWriter, r *http.Request) {
