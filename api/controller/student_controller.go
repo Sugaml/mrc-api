@@ -162,7 +162,7 @@ func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request)
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, student)
+	responses.JSON(w, http.StatusOK, response)
 }
 
 func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
@@ -182,7 +182,7 @@ func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, student)
+	responses.JSON(w, http.StatusOK, response)
 }
 
 func (server *Server) ListStudents(w http.ResponseWriter, r *http.Request) {
