@@ -177,6 +177,11 @@ func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
+	response := models.StudentResponse{}
+	if err = models.JSONModelConverter(student, response); err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
 	responses.JSON(w, http.StatusOK, student)
 }
 
