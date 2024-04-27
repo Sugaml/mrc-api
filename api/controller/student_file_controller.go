@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
 
 	"github.com/gorilla/mux"
 )
@@ -40,6 +41,27 @@ func (server *Server) StudentFileInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data.CertifiacteTranscript = path.SecureURL
+	sfile, err := sfrepo.SaveStudentFile(server.DB, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, sfile)
+}
+
+func (server *Server) StudentDocument(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	defer r.Body.Close()
+	data := &models.StudentFile{}
+	err = json.Unmarshal(body, data)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
 	sfile, err := sfrepo.SaveStudentFile(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)

@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
-	"sugam-project/api/utils/mailer"
-	"sugam-project/api/utils/security"
+
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
+	"github.com/Sugaml/mrc-api/api/utils/mailer"
+	"github.com/Sugaml/mrc-api/api/utils/security"
 )
 
 var resetPwd = repository.NewResetPassword()

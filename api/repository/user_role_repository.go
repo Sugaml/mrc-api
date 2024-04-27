@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 
-	"sugam-project/api/models"
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 )

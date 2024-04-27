@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -22,6 +23,25 @@ type Student struct {
 	UserId         uint   `gorm:"user_id" json:"user_id"`
 	User           User   `gorm:"foreignkey:UserId" json:"user"`
 	IsApproved     bool   `gorm:"is_approved;default:false" json:"is_approved"`
+}
+
+type StudentResponse struct {
+	ID             uint           `json:"id"`
+	CreatedAt      time.Time      `json:"createdAt"`
+	FirstName      string         `json:"firstName"`
+	LastName       string         `json:"lastName"`
+	Gender         string         `json:"gender"`
+	DOB            string         `json:"dob"`
+	MobileNumber   string         `json:"mobileNum"`
+	Email          string         `json:"email"`
+	ParanetName    string         `json:"parentName"`
+	ParanetMobile  string         `json:"parentMobile"`
+	ParentRelation string         `json:"parentRelation"`
+	CID            uint           `json:"cid"`
+	Course         CourseResponse `json:"course"`
+	UserId         uint           `json:"userId"`
+	User           UserResponse   `json:"user"`
+	IsApproved     bool           `json:"isApproved"`
 }
 
 type StudentStatusRequest struct {

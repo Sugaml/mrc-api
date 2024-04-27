@@ -5,10 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/auth"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
+	"github.com/Sugaml/mrc-api/api/utils/mailer"
 
 	"github.com/gorilla/mux"
 )
@@ -49,12 +51,22 @@ func (server *Server) StudentInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data.UserId = uid
-	course, err := srepo.SaveStudent(server.DB, data)
+	student, err := srepo.FindbyUserId(server.DB, uint(uid))
+	if err == nil {
+		st, err := srepo.UpdateStudent(server.DB, data, student.ID)
+		if err != nil {
+			responses.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		responses.JSON(w, http.StatusCreated, st)
+		return
+	}
+	result, err := srepo.SaveStudent(server.DB, data)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, course)
+	responses.JSON(w, http.StatusCreated, result)
 }
 
 func (server *Server) UpdateStudentInfo(w http.ResponseWriter, r *http.Request) {
@@ -115,6 +127,13 @@ func (server *Server) UpdateStudentStatus(w http.ResponseWriter, r *http.Request
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
+	if studentUpdated.Email != "" {
+		err = mailer.SendStudentEnrollApprovedEmail(studentUpdated.Email, student.FirstName+" "+studentUpdated.LastName)
+		if err != nil {
+			responses.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+	}
 	responses.JSON(w, http.StatusOK, studentUpdated)
 }
 
@@ -139,7 +158,12 @@ func (server *Server) StudentGeneralInfo(w http.ResponseWriter, r *http.Request)
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, student)
+	response := models.StudentResponse{}
+	if err = models.JSONModelConverter(student, response); err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, student)
 }
 
 func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +178,12 @@ func (server *Server) StudentDetail(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, student)
+	response := models.StudentResponse{}
+	if err = models.JSONModelConverter(student, response); err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, student)
 }
 
 func (server *Server) ListStudents(w http.ResponseWriter, r *http.Request) {

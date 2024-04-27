@@ -6,10 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/auth"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
 
 	"github.com/gorilla/mux"
 )
@@ -27,9 +28,9 @@ var repo = repository.NewCourseRepo()
 // @Success 201 {object} models.Course
 // @Router /course [post]
 func (server *Server) CreateCourse(w http.ResponseWriter, r *http.Request) {
-	err := server.CheckAdminAuthorization(r)
+	_, err := auth.ExtractTokenID(r)
 	if err != nil {
-		responses.ERROR(w, http.StatusUnauthorized, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 	body, err := ioutil.ReadAll(r.Body)

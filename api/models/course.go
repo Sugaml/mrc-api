@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -20,6 +21,23 @@ type Course struct {
 	Faculty      string `gorm:"faculty" json:"faculty"`
 	Year         uint   `gorm:"year" json:"year"`
 	IsActive     bool   `gorm:"is_active" json:"is_active"`
+}
+
+type CourseResponse struct {
+	ID           uint      `json:"id"`
+	CreatedAt    time.Time `json:"createdAt"`
+	Name         string    `json:"name"`
+	Discription  string    `json:"discription"`
+	Fee          uint      `json:"fee"`
+	Duration     uint      `json:"duration"`
+	CreditHours  uint      `json:"creditHours"`
+	CourseType   string    `json:"courseType"`
+	AffiliatedBy string    `json:"affiliatedBy"`
+	Quota        int       `json:"quota"`
+	Subject      uint      `json:"subject"`
+	Faculty      string    `json:"faculty"`
+	Year         uint      `json:"year"`
+	IsActive     bool      `json:"isActive"`
 }
 
 func (course *Course) Validate() error {

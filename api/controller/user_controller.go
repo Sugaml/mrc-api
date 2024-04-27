@@ -6,14 +6,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/auth"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
-	"sugam-project/api/utils/mailer"
+
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
+	"github.com/Sugaml/mrc-api/api/utils/mailer"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var urepo = repository.NewUserRepo()
@@ -90,6 +92,58 @@ func (server *Server) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusOK, user)
+}
+
+// ChangePasssword godoc
+// @Summary Change Password
+// @Description Change Password with the input payload
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Security ApiKeyAuth
+// @Param id path int true "course id"
+// @Param body body models.Course true "Chanage Password"
+// @Success 200 {object} models.ChangePasswordRequest
+// @Router /users/{id}/change-password [put]
+func (server *Server) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	req := &models.ChangePasswordRequest{}
+	user, err := urepo.FindbyId(server.DB, uint(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	err = json.Unmarshal(body, req)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	password, err := req.Validate()
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	hash, err := repository.Hash(password)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	err = urepo.SetPassword(server.DB, user.ID, string(hash))
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, "successfully changed password")
 }
 
 func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
@@ -200,6 +254,11 @@ func (server *Server) GetLogin(w http.ResponseWriter, r *http.Request) {
 	data, err := urepo.FindbyUsername(server.DB, user.Username)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	err = repository.VerifyPassword(data.Password, user.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("incorrect password "))
 		return
 	}
 	if !data.EmailVerified {

@@ -5,11 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
+	"github.com/Sugaml/mrc-api/api/utils/mailer"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 var serepo = repository.NewStudentEducationRepo()
@@ -41,6 +44,17 @@ func (server *Server) StudentEducation(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		studenEdu = append(studenEdu, *sedu)
+	}
+	logrus.Info("Student is in education :: ", datas[0].StudentID)
+	student, err := srepo.FindbyId(server.DB, datas[0].StudentID)
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	err = mailer.SendStudentEnrollCompletedEmail(student.Email, student.FirstName+" "+student.LastName)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	responses.JSON(w, http.StatusCreated, studenEdu)
@@ -88,6 +102,7 @@ func (server *Server) UpdateStudentEducation(w http.ResponseWriter, r *http.Requ
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
+
 	responses.JSON(w, http.StatusOK, studentEduUpdated)
 }
 

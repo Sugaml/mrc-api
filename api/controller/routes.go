@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sugam-project/api/auth"
-	"sugam-project/api/middleware"
-	"sugam-project/api/responses"
 
-	_ "sugam-project/docs"
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/middleware"
+	"github.com/Sugaml/mrc-api/api/responses"
 
-	"github.com/sirupsen/logrus"
+	_ "github.com/Sugaml/mrc-api/docs"
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -52,6 +52,7 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/user/{id}", server.DeleteUser, "DELETE")
 	server.setJSON("/user/forgot-password", server.ForgotPassword, "POST")
 	server.setJSON("/user/reset-password", server.ResetPassword, "POST")
+	server.setJSON("/users/change-password", server.ChangePassword, "PUT")
 
 	server.setJSON("/student_info", server.StudentInfo, "POST")
 	server.setJSON("/students", server.ListStudents, "GET")
@@ -59,6 +60,7 @@ func (server *Server) initializeRoutes() {
 	server.setJSON("/student/general-info", server.StudentGeneralInfo, "GET")
 	server.setJSON("/student/address", server.StudentAddress, "POST")
 	server.setJSON("/student/education", server.StudentEducation, "POST")
+	server.setJSON("/student/document", server.StudentDocument, "POST")
 	server.setJSON("/student/{sid}/status", server.UpdateStudentStatus, "PUT")
 	server.setJSON("/student/file", server.StudentFileInfo, "POST")
 	server.setJSON("/student/{sid}/address", server.GetStudentAddress, "GET")
@@ -92,12 +94,12 @@ func (server *Server) SetRoutes(path string, envValue string) {
 		copyHeader(proxyReq.Header, r.Header)
 		userId, _ := auth.ExtractTokenID(r)
 		if userId != 0 {
-			userGotten, _ := urepo.FindbyId(server.DB, userId)
-			if userGotten != nil {
-				logrus.Infof("proxy passed by :: %s :: %w", userGotten.ID, userGotten.IsAdmin)
+			user, _ := urepo.FindbyId(server.DB, userId)
+			if user != nil {
+				proxyReq.Header.Set("x-user-id", fmt.Sprint(userId))
+				proxyReq.Header.Set("X-USER-FOLDER", fmt.Sprintf("user-bucket-%d", user.ID))
 			}
-			proxyReq.Header.Set("x-user-id", fmt.Sprint(userId))
-			if userGotten != nil && userGotten.IsAdmin {
+			if user != nil && user.IsAdmin {
 				proxyReq.Header.Set("x-user-role", "ADMIN")
 			}
 		}

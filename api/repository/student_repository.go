@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"sugam-project/api/models"
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 	"github.com/rs/zerolog/log"
@@ -62,7 +62,41 @@ func (cr *StudentRepo) SaveStudent(db *gorm.DB, data *models.Student) (*models.S
 }
 
 func (cr *StudentRepo) UpdateStudent(db *gorm.DB, data *models.Student, cid uint) (*models.Student, error) {
-	err := db.Model(&models.Student{}).Where("id = ?", cid).Updates(data).Take(data).Error
+	req := &models.Student{}
+	if data.FirstName != "" {
+		req.FirstName = data.FirstName
+	}
+	if data.LastName != "" {
+		req.LastName = data.LastName
+	}
+	if data.Email != "" {
+		req.Email = data.Email
+	}
+	if data.DOB != "" {
+		req.DOB = data.DOB
+	}
+	if data.MobileNumber != "" {
+		req.MobileNumber = data.MobileNumber
+	}
+	if data.CID != 0 {
+		req.CID = data.CID
+	}
+	if data.UserId != 0 {
+		req.UserId = data.UserId
+	}
+	if data.Gender != "" {
+		req.Gender = data.Gender
+	}
+	if data.ParanetMobile != "" {
+		req.ParanetMobile = data.ParanetMobile
+	}
+	if data.ParanetName != "" {
+		req.ParanetName = data.ParanetName
+	}
+	if data.ParentRelation != "" {
+		req.ParentRelation = data.ParentRelation
+	}
+	err := db.Model(&models.Student{}).Where("id = ?", cid).Updates(req).Take(data).Error
 	if err != nil {
 		return &models.Student{}, err
 	}

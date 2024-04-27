@@ -6,7 +6,7 @@ package mockdb
 
 import (
 	reflect "reflect"
-	models "sugam-project/api/models"
+	models "github.com/Sugaml/mrc-api/api/models"
 
 	gomock "github.com/golang/mock/gomock"
 	gorm "github.com/jinzhu/gorm"

@@ -4,8 +4,9 @@ import (
 	"html"
 	"regexp"
 	"strings"
-	"sugam-project/api/models"
 	"time"
+
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 	"github.com/rs/zerolog/log"
@@ -16,6 +17,7 @@ type IUser interface {
 	FindAll(db *gorm.DB) (*[]models.User, error)
 	FindbyId(db *gorm.DB, uid uint) (*models.User, error)
 	FindbyUsername(db *gorm.DB, username string) (*models.User, error)
+	SetPassword(db *gorm.DB, id uint, pwd string) error
 	Save(db *gorm.DB, user *models.User) (*models.User, error)
 	Update(db *gorm.DB, user *models.User, uid uint) (*models.User, error)
 	UpdatePassword(db *gorm.DB, u *models.User) error
@@ -157,6 +159,14 @@ func (cr *UserRepo) FindbyId(db *gorm.DB, uid uint) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (r *UserRepo) SetPassword(db *gorm.DB, id uint, pwd string) error {
+	return db.Model(&models.User{}).Where("id = ?", id).UpdateColumns(
+		map[string]interface{}{
+			"password": pwd,
+		},
+	).Error
 }
 
 func (cr *UserRepo) FindbyUsername(db *gorm.DB, username string) (*models.User, error) {
