@@ -6,10 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sugam-project/api/auth"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/responses"
 
 	"github.com/gorilla/mux"
 )

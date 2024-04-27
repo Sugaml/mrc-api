@@ -6,11 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sugam-project/api/auth"
-	"sugam-project/api/middleware"
-	"sugam-project/api/responses"
 
-	_ "sugam-project/docs"
+	"github.com/Sugaml/mrc-api/api/auth"
+	"github.com/Sugaml/mrc-api/api/middleware"
+	"github.com/Sugaml/mrc-api/api/responses"
+
+	_ "github.com/Sugaml/mrc-api/docs"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )

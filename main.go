@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"sugam-project/api/config"
-	"sugam-project/api/controller"
-	"sugam-project/api/db/postgres"
+	"github.com/Sugaml/mrc-api/api/config"
+	"github.com/Sugaml/mrc-api/api/controller"
+	"github.com/Sugaml/mrc-api/api/db/postgres"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"

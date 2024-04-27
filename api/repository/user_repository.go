@@ -4,8 +4,9 @@ import (
 	"html"
 	"regexp"
 	"strings"
-	"sugam-project/api/models"
 	"time"
+
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 	"github.com/rs/zerolog/log"

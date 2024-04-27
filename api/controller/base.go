@@ -3,9 +3,10 @@ package controller
 import (
 	"net/http"
 	"os"
-	"sugam-project/api/middleware"
-	"sugam-project/api/repository"
-	"sugam-project/api/utils/storage"
+
+	"github.com/Sugaml/mrc-api/api/middleware"
+	"github.com/Sugaml/mrc-api/api/repository"
+	"github.com/Sugaml/mrc-api/api/utils/storage"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"

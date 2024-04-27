@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	mockdb "sugam-project/api/mocks"
-	"sugam-project/api/models"
-	"sugam-project/api/repository"
+	mockdb "github.com/Sugaml/mrc-api/api/mocks"
+	"github.com/Sugaml/mrc-api/api/models"
+	"github.com/Sugaml/mrc-api/api/repository"
 )
 
 type CTestServer struct {

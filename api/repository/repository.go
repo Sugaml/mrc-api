@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"sugam-project/api/models"
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 )

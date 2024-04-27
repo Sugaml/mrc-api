@@ -1,4 +1,4 @@
-module sugam-project
+module github.com/Sugaml/mrc-api
 
 go 1.18
 

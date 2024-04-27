@@ -3,7 +3,8 @@ package repository
 import (
 	"html"
 	"strings"
-	"sugam-project/api/models"
+
+	"github.com/Sugaml/mrc-api/api/models"
 
 	"github.com/jinzhu/gorm"
 )

@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"sugam-project/api/responses"
+
+	"github.com/Sugaml/mrc-api/api/responses"
 
 	"github.com/google/uuid"
 )
